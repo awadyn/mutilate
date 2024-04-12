@@ -23,6 +23,68 @@ Building
     apt-get install scons libevent-dev gengetopt libzmq-dev
     scons
 
+Building for Ubuntu 22.04
+=========================
+Versioning issues will be encountered when building mutilate on Ubuntu-22.04.
+Requirements are almost identical: 
+1. A C++0x compiler        --> no change
+2. scons                   --> need scons version 3.1.2
+3. libevent                --> no change
+4. gengetopt               --> no change
+5. zeromq (optional)       --> Ubuntu-22.04 packages provide zeromq version 3
+
+Start by updating and upgrading the system to reflect current package repositories:
+
+    $ sudo apt update && sudo apt upgrade -y
+
+Use ubuntu package manager to install requirements that do not 
+exhibit versioning issues:
+
+    $ sudo apt install libevent-dev gengetopt libzmq3-dev
+
+----------------------------------------------------------------------------
+
+Mutilate build requires python2.7 to proceed successfully. For that reason,
+the scons package used to build mutilate must be compatible with python2.7.
+1. Confirm that python2.7 is installed; install otherwise:
+   
+    $ which python2.7
+    $ sudo apt install python2.7
+   
+2. Now, install a version of pip compatible with python2.7:
+
+    $ wget -P ~/.local/lib https://bootstrap.pypa.io/pip/2.7/get-pip.py
+    $ python2.7 ~/.local/lib/get-pip.py --user
+
+   The first command downloads the get_pip.py module compatible with python2.7
+   and installs it locally in ~/.local/lib.
+   The second command uses python2.7 to execute get_pip.py and install pip
+   locally for the user (versus globally for the system) in ~/.local/bin.
+   (Because this version of pip conflicts with the default one in
+    Ubuntu-22.04, it is best to install it locally.)
+
+3. Use python-2.7 and compatible pip to install a compatible scons package:
+
+    $ python2.7 -m pip install --user scons
+
+   This command uses pip to install the newest scons version that is
+   compatible with python-2.7 - scons-3.1.2.
+   The install is done locally with destination ~/.local/bin.
+   (Because this version of scons conflicts with the default one in
+    Ubuntu-22.04, it is best to install it locally.)
+
+----------------------------------------------------------------------------
+
+With all the requirements now satisfied, we can build mutilate using scons:
+
+    $ cd mutilate
+    $ python2.7 ~/.local/bin/scons
+
+Check that mutilate executes:
+
+    $ ./mutilate --help
+
+
 Basic Usage
 ===========
 
