@@ -42,19 +42,18 @@ exhibit versioning issues:
 
     $ sudo apt install libevent-dev gengetopt libzmq3-dev
 
-----------------------------------------------------------------------------
-
 Mutilate build requires python2.7 to proceed successfully. For that reason,
 the scons package used to build mutilate must be compatible with python2.7.
+
 1. Confirm that python2.7 is installed; install otherwise:
-   
-    $ which python2.7
-    $ sudo apt install python2.7
+
+        $ which python2.7
+        $ sudo apt install python2.7
    
 2. Now, install a version of pip compatible with python2.7:
 
-    $ wget -P ~/.local/lib https://bootstrap.pypa.io/pip/2.7/get-pip.py
-    $ python2.7 ~/.local/lib/get-pip.py --user
+        $ wget -P ~/.local/lib https://bootstrap.pypa.io/pip/2.7/get-pip.py
+        $ python2.7 ~/.local/lib/get-pip.py --user
 
    The first command downloads the get_pip.py module compatible with python2.7
    and installs it locally in ~/.local/lib.
@@ -63,17 +62,15 @@ the scons package used to build mutilate must be compatible with python2.7.
    (Because this version of pip conflicts with the default one in
     Ubuntu-22.04, it is best to install it locally.)
 
-3. Use python-2.7 and compatible pip to install a compatible scons package:
+3. Use python2.7 and compatible pip to install a compatible scons package:
 
-    $ python2.7 -m pip install --user scons
+        $ python2.7 -m pip install --user scons
 
    This command uses pip to install the newest scons version that is
-   compatible with python-2.7 - scons-3.1.2.
+   compatible with python2.7; this is scons-3.1.2.
    The install is done locally with destination ~/.local/bin.
    (Because this version of scons conflicts with the default one in
     Ubuntu-22.04, it is best to install it locally.)
-
-----------------------------------------------------------------------------
 
 With all the requirements now satisfied, we can build mutilate using scons:
 
