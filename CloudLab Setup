@@ -1,6 +1,9 @@
 Follow these steps to setup 2 or more CloudLab nodes with 1 Memcached server and 1 or more Mutilate load generation clients.
+----------------------------------------------------------------------------------------------------------------------------
 
 1. Get access to >= 2 CloudLab nodes loaded with Ubuntu 22.04 image.
+
+-----------------------------------------------------------------------
 
 2. Allow nodes ssh access to each other:
 
@@ -11,8 +14,12 @@ Terminal A:                                                   |  Terminal B:
    user@node0:~$                                              |         --> append node0 id_rsa.pub to file ~/.ssh/authorized_keys
       --> append node1 id_rsa.pub to ~/.ssh/authorized_keys   |     user@node1:~$ cat ~/.ssh/id_rsa.pub
 
+-----------------------------------------------------------------------
+
 3. Update Ubuntu package repository and upgrade packages on all nodes:
    user@nodeX:~$ sudo apt update && sudo apt upgrade -y
+
+-----------------------------------------------------------------------
 
 4. Download and build Memcached on 1 node:
 
@@ -23,6 +30,8 @@ Terminal A:
    user@node0:~$ tar -xf latest -C memcached --strip-components=1
    user@node0:~$ cd memcached/
    user@node0:~$ ./configure && make && make test && sudo make install
+
+-----------------------------------------------------------------------
 
 5. Download and build Mutilate on all other nodes:
 
@@ -40,4 +49,26 @@ Terminal Y:
    user@nodeX:~$ g++ -o mutilate monloop.o mutilate.o cmdline.o log.o distributions.o util.o \
                         Connection.o Protocol.o Generator.o -L/opt/local/lib -levent -lpthread -lrt -lzmq
 
+-----------------------------------------------------------------------
+Testing:
+--------
 
+6. Test run Memcached with T threads:
+
+Terminal A:
+   user@node0:~$ taskset -c 0-<T-1> ~/memcached/memcached -u nobody -t <T> -m 32G -c 8192 -b 8192 -l 10.10.1.2 -B binary
+
+
+7. Test run Mutilate agents with 16 threads each:
+
+Terminal Y:
+   user@nodeX:~$ ~/mutilate/mutilate --agentmode --threads=16
+
+
+8. Test run Mutilate master with 1 thread (first, load database):
+
+Terminal B:
+   user@nodeX:~$ taskset -c 0 ~/mutilate/mutilate --binary -s 10.10.1.K --loadonly -K fb_key -V fb_value
+   user@nodeX:~$ taskset -c 0 ~/mutilate/mutilate --binary -s 10.10.1.K --noload --agent={10.10.1.M,10.10.1.N,10.10.1.P,..} \
+                         --threads=1 --keysize=fb_key --valuesize=fb_value --iadist=fb_ia --update=0.25 --depth=4           \
+                         --connections=4 --measure_qps=2000 --qps=<QPS> --time=30
