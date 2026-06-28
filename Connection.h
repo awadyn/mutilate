@@ -43,10 +43,13 @@ public:
   /* YA */
   double time_stats;
   double time_period;
+  double time_subperiod;
   double time_init;
   double time_now;
   double qps_prev;
   long unsigned int prev_nops;
+  double lambda_delta;
+  double multiplier;
   double get_ia_lambda() { return ((GPareto *)iagen)->get_ia_lambda(); };
   void set_ia_lambda(int val) {((GPareto *)iagen)->set_lambda(val); }
   double get_ia_shape() { return ((GPareto *)iagen)->get_shape(); };
