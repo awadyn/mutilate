@@ -349,41 +349,49 @@ void Connection::drive_write_machine(double now) {
 	      qps_prev = qps_now;
 	      prev_nops = nops;
       }
-      /* simulating twitter trace behavior cluster50 */
-      if (time_init > 5) {
-	      // begin increase QPS
-	      multiplier = 1;	// 1: increase QPS, -1: decrease QPS
-	      double lambda_cur = get_ia_lambda();	// use initial QPS as increase/decrease factor
-	      lambda_delta = lambda_cur / 2;
-	      set_ia_lambda(lambda_cur + lambda_delta * multiplier);	// this is the initial QPS change
-	      time_period = 0;
-	      time_subperiod = 0;
-	      time_init = -6000;
-      }
-      if (time_period > 60) {
-	      // switch between increase/decrease QPS
-	      multiplier = multiplier * -1;
-	      double lambda_cur = get_ia_lambda();
-	      set_ia_lambda(lambda_cur + lambda_delta * multiplier);
-	      time_subperiod = 0;	// reset to avoid hitting next condition immediately
-	      time_period = 0;
-      }
-      if (time_subperiod > 5) {
-	      double lambda_cur = get_ia_lambda();
-	      set_ia_lambda(lambda_cur + lambda_delta * multiplier);
-	      time_subperiod = 0;
-      }
 
-//      /* IF LEADER */
-//      if (time_stats > 3) { /* print stats every 3 seconds */
-//	      double lat_now = stats.get_nth(99);
-//	      printf("%f %f\n", time_now, lat_now);
-//	      time_stats = 0;
-//	      std::vector<uint64_t> bins_now = stats.get_sampler.bins;
-//	      std::fill(bins_now.begin(), bins_now.end(), 0);
-//	      stats.get_sampler.bins = bins_now;
+      /* stepwise qps doubling */
+      if (time_period > 10) {
+	      // switch between increase/decrease QPS
+	      double lambda_cur = get_ia_lambda();
+	      set_ia_lambda(lambda_cur * 2);
+	      time_period = 0;
+      }
+//      /* simulating twitter trace behavior cluster50 */
+//      if (time_init > 5) {
+//	      // begin increase QPS
+//	      multiplier = 1;	// 1: increase QPS, -1: decrease QPS
+//	      double lambda_cur = get_ia_lambda();	// use initial QPS as increase/decrease factor
+//	      lambda_delta = lambda_cur / 2;
+//	      set_ia_lambda(lambda_cur + lambda_delta * multiplier);	// this is the initial QPS change
+//	      time_period = 0;
+//	      time_subperiod = 0;
+//	      time_init = -6000;
 //      }
-      /* YA */
+//      if (time_period > 60) {
+//	      // switch between increase/decrease QPS
+//	      multiplier = multiplier * -1;
+//	      double lambda_cur = get_ia_lambda();
+//	      set_ia_lambda(lambda_cur + lambda_delta * multiplier);
+//	      time_subperiod = 0;	// reset to avoid hitting next condition immediately
+//	      time_period = 0;
+//      }
+//      if (time_subperiod > 5) {
+//	      double lambda_cur = get_ia_lambda();
+//	      set_ia_lambda(lambda_cur + lambda_delta * multiplier);
+//	      time_subperiod = 0;
+//      }
+//
+////      /* IF LEADER */
+////      if (time_stats > 3) { /* print stats every 3 seconds */
+////	      double lat_now = stats.get_nth(99);
+////	      printf("%f %f\n", time_now, lat_now);
+////	      time_stats = 0;
+////	      std::vector<uint64_t> bins_now = stats.get_sampler.bins;
+////	      std::fill(bins_now.begin(), bins_now.end(), 0);
+////	      stats.get_sampler.bins = bins_now;
+////      }
+//      /* YA */
 
 
       if (options.skip && options.lambda > 0.0 &&
